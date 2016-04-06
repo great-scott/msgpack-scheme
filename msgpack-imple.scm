@@ -2,7 +2,7 @@
 ;;
 ;;  Copyright (c) 2013, Hugo Arregui
 ;;  All rights reserved.
-;;  
+;;
 ;;  Redistribution and use in source and binary forms, with or without
 ;;  modification, are permitted provided that the following conditions
 ;;  are met:
@@ -13,7 +13,7 @@
 ;;     documentation and/or other materials provided with the distribution.
 ;;  3. The name of the authors may not be used to endorse or promote products
 ;;     derived from this software without specific prior written permission.
-;;  
+;;
 ;;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
 ;;  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ;;  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -51,8 +51,8 @@
 
 ;; constants
 (define constants '((()      . #xc0)
-                    (#t      . #xc3) 
-                    (#f      . #xc2) 
+                    (#f      . #xc2)
+                    (#t      . #xc3)
                     (uint8   . #xcc)
                     (uint16  . #xcd)
                     (uint32  . #xce)
@@ -71,8 +71,8 @@
                     (map32   . #xdf)))
 
 (define constant-repr-map (alist->hash-table constants))
-(define repr-constant-map 
-(alist->hash-table (map (lambda (entry) 
+(define repr-constant-map
+(alist->hash-table (map (lambda (entry)
                           (cons (cdr entry) (car entry))) constants)))
 
 (define (read-byte/eof-error port)
@@ -99,7 +99,7 @@
   (apply bitwise-ior
          (let loop ((shift_size (- (* size 8) 8)))
            (if (>= shift_size 0)
-             (cons (arithmetic-shift 
+             (cons (arithmetic-shift
                      (f (read-byte/eof-error port)) shift_size)
                    (loop (- shift_size 8)))
              '()))))
@@ -118,7 +118,7 @@
   (write-bytes port value size))
 
 (define (read-sint port size #!optional (mapper identity))
-  (mapper 
+  (mapper
     (- (+ (read-bytes port size (lambda (b) (- 255 b)))
           1))))
 
@@ -127,11 +127,11 @@
 
 (define (read-float port #!optional (mapper identity))
   (mapper (byte-blob->float (byte-blob-reverse (read-raw port 4)))))
-       
+
 (define (write-double port value)
   (write-raw port (double->byte-blob value) 8))
 
-(define (read-double port #!optional (mapper identity)) 
+(define (read-double port #!optional (mapper identity))
   (mapper (byte-blob->double (byte-blob-reverse (read-raw port 8)))))
 
 (define (write-raw port blob size)
@@ -157,7 +157,7 @@
       (pack port (vector-ref array index))
       (loop (+ index 1)))))
 
-(define (read-array port size #!optional (mapper identity)) 
+(define (read-array port size #!optional (mapper identity))
   (define array (make-vector size))
   (let loop ((index 0))
     (when (< index size)
@@ -171,7 +171,7 @@
                            (pack port k)
                            (pack port v))))
 
-(define (read-map port size #!optional (mapper identity)) 
+(define (read-map port size #!optional (mapper identity))
   (define table (make-hash-table #:size size))
   (let loop ((size size))
     (if (> size 0)
