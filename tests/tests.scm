@@ -1,6 +1,6 @@
 ;;  Copyright (c) 2013, Hugo Arregui
 ;;  All rights reserved.
-;;  
+;;
 ;;  Redistribution and use in source and binary forms, with or without
 ;;  modification, are permitted provided that the following conditions
 ;;  are met:
@@ -11,7 +11,7 @@
 ;;     documentation and/or other materials provided with the distribution.
 ;;  3. The name of the authors may not be used to endorse or promote products
 ;;     derived from this software without specific prior written permission.
-;;  
+;;
 ;;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
 ;;  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ;;  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -30,10 +30,10 @@
 
 (define fast/full 'fast) ; some tests are slow
 
-(define-syntax with-mocks 
+(define-syntax with-mocks
   (syntax-rules ()
     ((with-mocks ((name value) . rest) body ...)
-     (let ((original name)) 
+     (let ((original name))
        (set! name value)
        (let ((r (with-mocks rest body ...)))
          (set! name original)
@@ -57,7 +57,7 @@
 
             (define (pack/unpack-test name value #!optional (mapper identity) (packer pack))
               (let* ((packed-buffer (call-with-output-string (cut packer <> value))))
-                (call-with-input-string packed-buffer 
+                (call-with-input-string packed-buffer
                                         (lambda (port)
                                           (let ((v (unpack port mapper)))
                                             (test name value v) ; unpacked value is the same that was packed
@@ -66,7 +66,7 @@
 
             (define (mapper-test name value mapper #!optional (packer pack))
               (let* ((packed-buffer (call-with-output-string (cut packer <> value))))
-                (call-with-input-string packed-buffer 
+                (call-with-input-string packed-buffer
                                         (lambda (port)
                                           (let ((v (unpack port mapper)))
                                             (test name v (mapper value))
@@ -129,7 +129,7 @@
                           (pack/unpack-test "array32" (make-vector (expt 2 17) 1))))
 
             (test-group "map"
-                        (pack/unpack-test "map mapper" 
+                        (pack/unpack-test "map mapper"
                                           (alist->hash-table '(("hola" . 1)
                                                                (12 . "chau"))) raw->string/mapper)
                         (pack/unpack-test "fixed map" (make-rnd-hash-table 2))
@@ -139,6 +139,10 @@
                           (pack/unpack-test "nested map" table))
                         (if (eq? fast/full 'full)
                           (pack/unpack-test "map32" (make-rnd-hash-table (expt 2 17)))))
+
+            (test-group "bin"
+                        (pack/unpack-test "bin8" (string->byte-blob "hallo") (lambda (x) x) pack-bin))
+
             ); end pack/unpack-test
 
 (test-group "limits"
@@ -197,7 +201,7 @@
                                       (packed-header (byte-blob-empty))))
 
                         (with-mocks ((write-raw (lambda (port value size) #t)))
-                                    (test-assert "empty" (empty-string? (call-with-output-string 
+                                    (test-assert "empty" (empty-string? (call-with-output-string
                                                                           (cut pack <> (byte-blob-empty)))))
                                     (test-assert "fixed raw min" (fixed-raw? (raw-packed-header 1)))
                                     (test-assert "fixed raw max" (fixed-raw? (raw-packed-header fixed_raw_limit)))

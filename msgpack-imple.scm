@@ -53,6 +53,7 @@
 (define constants '((()      . #xc0)
                     (#f      . #xc2)
                     (#t      . #xc3)
+                    (bin8    . #xc4)
                     (uint8   . #xcc)
                     (uint16  . #xcd)
                     (uint32  . #xce)
@@ -246,6 +247,12 @@
   (write-header port 'double)
   (write-double port value))
 
+(define (pack-bin port value)
+  (let ((size (byte-blob-length value)))
+    (write-header port 'bin8)
+    (write-uint port size 1)
+    (write-raw port value size)))
+
 (define (pack-raw port value)
   (assert (byte-blob? value))
   (let ((size (byte-blob-length value)))
@@ -376,6 +383,9 @@
                      ((eq? constant 'map32)
                       (let ((size (read-uint port 4)))
                         (read-map port size mapper)))
+                     ((eq? constant 'bin8)
+                      (let ((size (read-uint port 1)))
+                        (read-raw port size mapper)))
                      (#t
                       (mapper constant)))))
             ((fixed-uint? value)
