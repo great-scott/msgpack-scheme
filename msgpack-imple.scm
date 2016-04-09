@@ -55,6 +55,7 @@
                     (#t      . #xc3)
                     (bin8    . #xc4)
                     (bin16   . #xc5)
+                    (bin32   . #xc6)
                     (uint8   . #xcc)
                     (uint16  . #xcd)
                     (uint32  . #xce)
@@ -254,7 +255,10 @@
     (cond ((= size 1)
            (write-header port 'bin8))
           ((= size 2)
-           (write-header port 'bin16)))
+           (write-header port 'bin16))
+          ((= size 4)
+           (write-header port 'bin32)))
+
     (write-uint port size size)
     (write-raw port value size)))
 
@@ -393,6 +397,9 @@
                         (read-raw port size mapper)))
                      ((eq? constant 'bin16)
                       (let ((size (read-uint port 2)))
+                        (read-raw port size mapper)))
+                     ((eq? constant 'bin32)
+                      (let ((size (read-uint port 4)))
                         (read-raw port size mapper)))
                      (#t
                       (mapper constant)))))

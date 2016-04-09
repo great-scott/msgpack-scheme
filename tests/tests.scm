@@ -51,6 +51,12 @@
 						(define (string-pack value)
               (call-with-output-string (cut pack <> value)))
 
+			(define (sp packer value)
+              (call-with-output-string (cut packer <> value)))
+
+			(define (up value)
+              (call-with-input-string value (cut unpack <> (lambda (a) a))))
+
             (define (pack/unpack value #!optional (mapper identity))
               (let* ((packed-buffer (string-pack value)))
                 (call-with-input-string packed-buffer (cut unpack <> mapper))))
@@ -150,6 +156,11 @@
                                           (u16vector->byte-blob #u16 (#xFFFFFFFFF))
                                           (lambda (x) x)
                                           pack-bin))
+
+                        (pack/unpack-test "bin32"
+                                          (u32vector->byte-blob #u32 (#xFFFFFFFFFFF))
+                                          (lambda (x) x)
+                                          pack-bin)
             ); end pack/unpack-test
 
 (test-group "limits"
