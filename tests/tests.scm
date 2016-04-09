@@ -141,8 +141,15 @@
                           (pack/unpack-test "map32" (make-rnd-hash-table (expt 2 17)))))
 
             (test-group "bin"
-                        (pack/unpack-test "bin8" (string->byte-blob "hallo") (lambda (x) x) pack-bin))
+                        (pack/unpack-test "bin8"
+                                          (u8vector->byte-blob #u8 (#xFFFF))
+                                          (lambda (x) x)
+                                          pack-bin)
 
+                        (pack/unpack-test "bin16"
+                                          (u16vector->byte-blob #u16 (#xFFFFFFFFF))
+                                          (lambda (x) x)
+                                          pack-bin))
             ); end pack/unpack-test
 
 (test-group "limits"
