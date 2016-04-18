@@ -157,7 +157,10 @@
   (assert (= (vector-length array) size))
   (let loop ((index 0))
     (when (< index size)
-      (pack port (vector-ref array index))
+      (let ((thing (vector-ref array index)))
+       (if (string? thing)
+           (pack-bin port (string->byte-blob thing))
+           (pack port thing)))
       (loop (+ index 1)))))
 
 (define (read-array port size #!optional (mapper identity))
